@@ -8,7 +8,8 @@
 //For me: trying to make a mouse pointer that is followed by a trail of small triangles??? start with circles and see how it goes. If there is time make a cute little halloween ghost 
 //https://www.geeksforgeeks.org/javascript/create-an-object-that-follows-the-mouse-pointer-using-p5-js/,
 // https://www.jhkinfotech.com/blog/cursor-animations-with-css-javascript-code-snippets, https://speckyboy.com/css-javascript-cursor-effects/
-//The very hungry caterpillar type of thing? like a bunch of circles (set a certain number of colors)
+//The very hungry caterpillar type of thing? like a bunch of circles (set a certain number of colors), I need it to be able to eat something?? so maybe spawn some things from the top of the program and then spawn random apples?? (can use an image likely) and have it eat it
+
 
 
 let radius = 20;
@@ -23,6 +24,8 @@ let movingCircle = [];
 let x = 0;
 let y = 0;
 let shapeValue = [];
+let speed = 3;
+let shrink = 0.95;
 
 
 function setup() {
@@ -39,6 +42,18 @@ function makeCirclePointer() {
 }
 
 function spawnCircle(xValue, yValue, _radius) {
+  for (let i = theCircle.length - 1; i >- 0; i--) {
+    let blob = theCircle.blobs[i];
+
+    blob.x += speed;
+    //not working yet erm, may have to add blob as a seperate object??
+    blob.triW *= shrink;
+  }
+
+  if (blob._radius < 1 || blob.x - blob._radius > width) {
+    theCircle.blob.splice(i, 1);
+  }
+
   let theCircle = {
     x: xValue,
     y: yValue,
@@ -49,8 +64,11 @@ function spawnCircle(xValue, yValue, _radius) {
     theCircle.push({x: mouseX - 10, y: mouseY - 10, r: r* 0.7});
   }
 
-  circle(circle.x, circle.y, _radius)
+  fill(random(255), random(255), random(255));
+  circle(circle.x, circle.y, _radius);
 }
+
+
 
 
 

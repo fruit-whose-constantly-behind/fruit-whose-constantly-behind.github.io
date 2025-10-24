@@ -9,8 +9,8 @@
 //https://www.geeksforgeeks.org/javascript/create-an-object-that-follows-the-mouse-pointer-using-p5-js/,
 // https://www.jhkinfotech.com/blog/cursor-animations-with-css-javascript-code-snippets, https://speckyboy.com/css-javascript-cursor-effects/
 //The very hungry caterpillar type of thing? like a bunch of circles (set a certain number of colors), I need it to be able to eat something?? so maybe spawn some things from the top of the program and then spawn random apples?? (can use an image likely) and have it eat it
-
-
+//https://stackoverflow.com/questions/22592773/how-to-spawn-objects-randomly-on-a-line-using-javascript-html5
+//https://jsfiddle.net/m1erickson/G2r2r/
 
 let radius = 20;
 let movingCircle = [];
@@ -26,7 +26,8 @@ let y = 0;
 let shapeValue = [];
 let speed = 3;
 let shrink = 0.95;
-
+let theCircle = [];
+let appleArray = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -66,6 +67,42 @@ function spawnCircle(xValue, yValue, _radius) {
 
   fill(random(255), random(255), random(255));
   circle(circle.x, circle.y, _radius);
+}
+
+function appleSpawn {
+  let newApple = {
+    x: _x, 
+    y: _y, 
+    xSpeed: random(-3, 3),
+    ySpeed: random(-3, 3),
+    radius: 40,
+  }
+  appleArray.push(newApple);
+}
+
+function moveApple() {
+  for (let apple of appleArray) {
+    apple.x = apple.x + apple.xSpeed;
+    apple.y = apple.y + apple.ySpeed;
+  }
+}
+
+function bounceApple() {
+  for (let apple of appleArray) {
+    if (apple.x < 0 + apple.radius || apple.x > width - BOLDITALIC.radius) {
+      apple.xSpeed = apple.xSpeed * -1;
+    }
+    if (apple.y < apple.y + apple.radius || apple.y > height - apple.radius) {
+      apple.ySpeed = apple.ySpeed * -1;
+    }
+  }
+}
+
+function showApple() {
+  for (let apple of appleArray) {
+    fill(163, 49, 62);
+    circle(apple.x, apple.y, apple.radius*2);
+  }
 }
 
 

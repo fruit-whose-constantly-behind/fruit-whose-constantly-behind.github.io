@@ -1,86 +1,104 @@
-// Project Title
+// Arrays and Objects: Very Hunger Caterpillar Simulation
 // Afrukhta Siddique
-// Date
+// Date: October 26, 2025
 //
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// Extra for Experts: 
+// - I used shift() and filter() for arrays, and lerp() (to gradually fade out my circles)
 
-//For me: trying to make a mouse pointer that is followed by a trail of small triangles??? start with circles and see how it goes. If there is time make a cute little halloween ghost 
+//Sources:
 //https://www.geeksforgeeks.org/javascript/create-an-object-that-follows-the-mouse-pointer-using-p5-js/,
-// https://www.jhkinfotech.com/blog/cursor-animations-with-css-javascript-code-snippets, https://speckyboy.com/css-javascript-cursor-effects/
-//The very hungry caterpillar type of thing? like a bunch of circles (set a certain number of colors), I need it to be able to eat something?? so maybe spawn some things from the top of the program and then spawn random apples?? (can use an image likely) and have it eat it
+//https://www.jhkinfotech.com/blog/cursor-animations-with-css-javascript-code-snippets
+//https://speckyboy.com/css-javascript-cursor-effects/
 //https://stackoverflow.com/questions/22592773/how-to-spawn-objects-randomly-on-a-line-using-javascript-html5
 //https://jsfiddle.net/m1erickson/G2r2r/
+//https://www.w3schools.com/js/default.asp
+//Credits to my older sister for helping me with this project!
 
 let radius = 20;
 let movingCircle = [];
-// let tri1x1 = mouseX;
-// let tri1y1 = mouseY - radius;
-// let tri1x2 = mouseX - radius;
-// let tri1y2 = mouseY - radius*2;
-// let tri1x3 = mouseX + radius;
-// let tri1y3 = mouseY + radius;
-
-let x = 0;
-let y = 0;
-let shapeValue = [];
-let speed = 3;
 let shrink = 0.95;
-let theCircle = [];
+let trailLimit = 150;
 let appleArray = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  noStroke();
+
+  //spawns a few apples in random positions
+  for (let i = 0; i < 5; i++) {
+    appleSpawn(random(width), random(height));
+  }
 }
 
 function draw() {
   background(220); 
+
+  //updates apples
+  moveApple();
+  bounceApple();
+  showApple();
+
+  //draws caterpillar and adds the trailing circles
   makeCirclePointer();
+  trailingCircles();
+
+  //makes apples disappear if hit by the caterpillar
+  eatApples();
 }
 
 function makeCirclePointer() {
-  circle(mouseX, mouseY, radius*2);
+  fill(98, 191, 132);
+  circle(mouseX, mouseY, radius * 2);
 }
 
-function spawnCircle(xValue, yValue, _radius) {
-  for (let i = theCircle.length - 1; i >- 0; i--) {
-    let blob = theCircle.blobs[i];
+function trailingCircles() {
+  //adds a new circle at the mouse position
+  movingCircle.push({
+    x: mouseX,
+    y: mouseY, 
+    r: radius
+  });
 
-    blob.x += speed;
-    //not working yet erm, may have to add blob as a seperate object??
-    blob.triW *= shrink;
+  //removes oldest circles if there are too many 
+  if (movingCircle.length > trailLimit) {
+    movingCircle.shift();
   }
 
-  if (blob._radius < 1 || blob.x - blob._radius > width) {
-    theCircle.blob.splice(i, 1);
+  //loops through each circle and draws it
+  for (let i = 0; i < movingCircle.length; i++) {
+    let blob = movingCircle[i];
+
+    //makes each circle in the trail shrink
+    blob.r = blob.r * shrink;
+
+    //makes bigger circles more visible, and smaller ones more transparant
+    let alphaValue = map(blob.r, 0, radius, 0, 200);
+    fill(98, 191, 132, alphaValue);
+
+    //creates the trail of circles
+    if (blob.r > 1) {
+      circle(blob.x, blob. y, blob.r * 2);
+    }
   }
 
-  let theCircle = {
-    x: xValue,
-    y: yValue,
-    r: _radius,
-  }
-
-  while (theCircle.x < windowWidth - 50 && theCircle.y < windowHeight - 50) {
-    theCircle.push({x: mouseX - 10, y: mouseY - 10, r: r* 0.7});
-  }
-
-  fill(random(255), random(255), random(255));
-  circle(circle.x, circle.y, _radius);
+  //removes circles if they are too small
+  movingCircle = movingCircle.filter(blob => blob.r > 1);
 }
 
-function appleSpawn {
+function appleSpawn(_x, _y) {
   let newApple = {
     x: _x, 
     y: _y, 
-    xSpeed: random(-3, 3),
-    ySpeed: random(-3, 3),
-    radius: 40,
-  }
+    xSpeed: random(-3, 3), //random horizontal speed
+    ySpeed: random(-3, 3), //random vertical speed
+    radius: 20,
+  };
+
   appleArray.push(newApple);
 }
 
 function moveApple() {
+  //update each apple's position based on its speed 
   for (let apple of appleArray) {
     apple.x = apple.x + apple.xSpeed;
     apple.y = apple.y + apple.ySpeed;
@@ -88,11 +106,12 @@ function moveApple() {
 }
 
 function bounceApple() {
+  //makes apples "bounce" if they hit an edge of the window
   for (let apple of appleArray) {
-    if (apple.x < 0 + apple.radius || apple.x > width - BOLDITALIC.radius) {
+    if (apple.x < apple.radius || apple.x > width - apple.radius) {
       apple.xSpeed = apple.xSpeed * -1;
     }
-    if (apple.y < apple.y + apple.radius || apple.y > height - apple.radius) {
+    if (apple.y < apple.radius || apple.y > height - apple.radius) {
       apple.ySpeed = apple.ySpeed * -1;
     }
   }
@@ -100,59 +119,45 @@ function bounceApple() {
 
 function showApple() {
   for (let apple of appleArray) {
+    //red apple body
     fill(163, 49, 62);
-    circle(apple.x, apple.y, apple.radius*2);
+    circle(apple.x, apple.y, apple.radius * 2);
+
+    //brown stem
+    fill(60, 30, 10);
+    rect(apple.x - 2, apple.y - apple.radius - 6, 4, 8, 2);
+
+    //green leaf
+    fill(40, 150, 60);
+    ellipse(apple.x + 6, apple.y - apple.radius - 2, 10, 5);
   }
 }
 
+function eatApples() {
+  //checks if apples hit the caterpillar head
+  for (let i = appleArray.length - 1; i >= 0; i--) {
+    let apple = appleArray[i];
+    let d = dist(mouseX, mouseY, apple.x, apple.y);
 
-
-
-
-// function draw() {
-//   background(220);
-//   makeCirclePointer();
-//   trailingCircle();
-// }
-
-// function makeCirclePointer() {
-//   circle(mouseX, mouseY, 40);
-//   triangle(tri1x1, tri1y1, tri1x2, tri1y2, tri1x3, tri1y3);
-//   triangle(mouseX + radius, mouseY, mouseX + radius*2, mouseY - radius, mouseX + radius*2, mouseY + radius);
-//   triangle(mouseX, mouseY + radius, mouseX - radius, mouseY + radius*2, mouseX + radius, mouseY + radius*2);
-//   triangle(mouseX - radius, mouseY, mouseX - radius*2, mouseY - radius, mouseX - radius*2, mouseY + radius);
-// }
-
-function trailingCircle() {  
-  movingTriangle.push({
-    x1: mouseX + radius,
-    y1: mouseY, 
-    x2: mouseX + radius*2,
-    y2: mouseY - radius, 
-    x3: mouseX + radius*2, 
-    y3: mouseY + radius, 
-  })
-
-  movingCircle.push({
-    xValue: mouseX + radius,
-    yValue: mouseY, 
-  })
-  movingTriangle.x1 = movingTriangle + 50;
-
-  for (let i = 0; i < (windowHeight/50); i = i + 50) {
-    movingCircle.xValue = movingCircle.xValue += (mouseX - x) * 0.04;
-    movingCircle.yValue = movingCircle.yvalue += (mouseY - y) * 0.04;
-    fill(0);
-    circle(movingCircle.xValue, movingCircle.y, 25, 25);
+    if (d < radius + apple.radius) {
+      appleArray.splice(i, 1); //removes apple
+      radius = min(radius + 2, 60);
+      appleSpawn(random(width), random(height));//spawn new apple
+    }
   }
-  //Trailing circle
-  x += (mouseX - x) * 0.04;
-  y += (mouseY - y) * 0.04;
-  fill(0);
-  circle(x, y, 25, 25);
+  
+  //returns radius back to 20 over time
+  radius = lerp(radius, 20, 0.01);
+}
 
-  // x += (mouseX - x) * 0.04;
-  // y += (mouseY - y) * 0.04;
-  // fill(0);
-  // circle(x, y, 25, 25);
+//pressing space spawns a new apple
+function keyPressed() {
+  if (key === " ") {
+    appleSpawn(random(width), random(height));
+  }
+}
+
+//resizes canvas to fit window
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
